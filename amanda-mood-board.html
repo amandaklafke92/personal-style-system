@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amanda's Style Mood Board</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, useMemo } = React;
+    
+
+const c = {
+  bg: "#F7F5F2",
+  bgAlt: "#EDEAE5",
+  card: "#FFFFFF",
+  text: "#2C2825",
+  textMuted: "#807A74",
+  accent: "#4A6B7A",
+  accentLight: "#D4E1E8",
+  warm: "#A68B6B",
+  warmLight: "#EDE6DB",
+  border: "#DDD8D2",
+  green: "#5A7C5E",
+  greenLight: "#E2EBE3",
+  coral: "#B86F50",
+  coralLight: "#F5E6DE",
+  charcoal: "#3C3937",
+  cream: "#F5F0E8",
+};
+
+const categories = {
+  casual: { label: "Everyday Smart Casual", color: c.accent, bg: c.accentLight },
+  dressy: { label: "Dressing Up", color: "#7B5E8A", bg: "#EDE5F0" },
+  summer: { label: "Summer / Warm Weather", color: c.coral, bg: c.coralLight },
+  layering: { label: "Layering & Texture", color: c.warm, bg: c.warmLight },
+  own: { label: "My Outfits", color: c.green, bg: c.greenLight },
+};
+
+const verdicts = {
+  yes: { label: "Works as-is", color: c.green, bg: c.greenLight },
+  adapt: { label: "Needs adapting", color: c.warm, bg: c.warmLight },
+  no: { label: "Not for my shape", color: c.coral, bg: c.coralLight },
+  own: { label: "My outfit", color: c.accent, bg: c.accentLight },
+};
+
+const entries = [
+  // ===== OWN OUTFITS =====
+  {
+    id: 1,
+    source: "own",
+    category: "own",
+    verdict: "own",
+    title: "White crop tee + denim skirt (Bali)",
+    description: "Relaxed white crop tee with high-waisted denim mini skirt, barefoot. Travel/holiday casual.",
+    whyItWorks: "High waist hits at the right spot and the crop length works perfectly with your torso proportions. The simplicity lets your shape do the talking.",
+    keyElements: ["High-waisted bottom", "Crop length top", "Neutral palette"],
+    formulaMatch: "The Sydney Summer",
+    note: "This is your comfort zone and it's a solid one — the foundation to build from.",
+  },
+  {
+    id: 2,
+    source: "own",
+    category: "own",
+    verdict: "adapt",
+    title: "Camel cardigan + baggy jeans + chunky sneakers",
+    description: "Cropped ribbed camel cardigan with high-waisted baggy jeans, rolled cuffs, chunky white sneakers and crew socks.",
+    whyItWorks: "The cardigan is great — colour, crop length, and ribbed texture all work. The high waist is right.",
+    whatToChange: "Swap the baggy jeans for straight or tapered leg. Replace chunky sneakers with cleaner sneakers or loafers. The volume at the bottom shortens your legs.",
+    keyElements: ["Cropped knit", "Earth tone", "High waist"],
+    formulaMatch: "The Smart Knit",
+    note: "The top half of this outfit is strong. Fix the bottom half and it's a winner.",
+  },
+  {
+    id: 3,
+    source: "own",
+    category: "own",
+    verdict: "adapt",
+    title: "Black cropped jacket + light wash wide jeans",
+    description: "Black zip-front cropped jacket with light wash wide-leg jeans, chunky white sneakers.",
+    whyItWorks: "The cropped jacket is the right length and the monochrome top is clean.",
+    whatToChange: "Same issue as above — the wide jeans pooling at the ankle with flat chunky shoes creates visual weight. Go straight-leg or tapered, show the ankle.",
+    keyElements: ["Cropped layer", "Monochrome top", "Denim"],
+    formulaMatch: "The Elevated Daily",
+    note: "This would look completely different with a straight jean and ankle boots.",
+  },
+  {
+    id: 4,
+    source: "own",
+    category: "own",
+    verdict: "yes",
+    title: "Cobalt blue fitted dress with waist detail",
+    description: "Fitted cowl-neck spaghetti strap dress in cobalt blue with wrap detail at waist. Going-out / event piece.",
+    whyItWorks: "This is the standout. The colour is phenomenal on you — picks up your eyes, pops against your skin. The fitted silhouette follows your natural shape without clinging. The waist detail draws the eye exactly where it should. You look confident in this because the outfit is genuinely working with your body.",
+    keyElements: ["Saturated cool colour", "Fitted silhouette", "Waist definition", "Statement piece"],
+    formulaMatch: "The Going Out",
+    note: "This is proof of concept — when the colour, fit, and silhouette all align for your body, the result is effortless. Use this as the benchmark.",
+  },
+  {
+    id: 5,
+    source: "own",
+    category: "own",
+    verdict: "yes",
+    title: "Brown chore jacket + fitted base",
+    description: "Dark brown cotton chore jacket with snap buttons, worn open over a dark base layer. Beaded choker necklace, nose ring.",
+    whyItWorks: "This jacket is a hero piece. The colour is rich and grounded, the structure is clean without being stiff, and the length frames your torso well. The snap buttons and utility pockets add just enough detail. Paired with your nose ring and beaded necklace, this is your 'structured ease' aesthetic in one layer.",
+    keyElements: ["Structured layer", "Earth tone", "Utility detail", "Accessory layering"],
+    formulaMatch: "The Dress Formula / The Denim Shirt",
+    note: "This jacket works over almost everything in your wardrobe — dresses, tees, tanks. It's the connective tissue of your style.",
+  },
+  // ===== INSTAGRAM SAVES =====
+  {
+    id: 6,
+    source: "instagram",
+    category: "layering",
+    verdict: "adapt",
+    title: "Turtleneck under sweatshirt + flare pants",
+    description: "White turtleneck layered under a grey collegiate sweatshirt, with black flare pants and platform slides.",
+    whyItWorks: "The turtleneck-under-sweatshirt layering trick is smart and adds visual interest to a casual top. The tonal simplicity is clean.",
+    whatToChange: "Flare pants would work against your proportions with flat shoes — they need height to elongate. Swap for straight or tapered trousers. Skip the platform slides; ankle boots or loafers would be sharper.",
+    keyElements: ["Layered necklines", "Grey + black palette", "Smart-casual hybrid"],
+    formulaMatch: "The Monochrome Stack (adapted)",
+    note: "The layering trick is the takeaway here, not the silhouette.",
+  },
+  {
+    id: 7,
+    source: "instagram",
+    category: "dressy",
+    verdict: "yes",
+    title: "White shirt + turtleneck + wide tailored trousers",
+    description: "Black turtleneck under open white button-up, tucked into wide-leg black tailored trousers with a belt. Black boots, glasses.",
+    whyItWorks: "This is a strong professional look. The layered collar detail, the defined waist via belt, and the monochrome palette all work.",
+    whatToChange: "On your frame, go for tapered rather than wide-leg trousers — or if you do wide-leg, make sure they're properly tailored (not baggy) and the boots have enough substance to anchor the volume.",
+    keyElements: ["Layered collars", "Belt at waist", "Monochrome", "Professional polish"],
+    formulaMatch: "The Polished Professional",
+    note: "Adapt the trouser shape and this is a very strong interview/networking outfit for you.",
+  },
+  {
+    id: 8,
+    source: "instagram",
+    category: "casual",
+    verdict: "adapt",
+    title: "Sweatshirt + satin midi skirt",
+    description: "Grey collegiate sweatshirt with a dark chocolate satin midi skirt. Casual-dressy high-low combination.",
+    whyItWorks: "The high-low contrast between casual knit and dressy fabric is the whole appeal. The chocolate colour is firmly in your palette.",
+    whatToChange: "Make sure the sweatshirt is cropped or tucked so your waist is visible — an untucked oversized sweatshirt over a midi skirt would look shapeless on an hourglass. The skirt itself would follow your curves beautifully in satin.",
+    keyElements: ["High-low mix", "Satin fabric", "Chocolate brown", "Texture contrast"],
+    formulaMatch: "The High-Low Mix",
+    note: "This is a great formula for you — just maintain waist definition on top.",
+  },
+  {
+    id: 9,
+    source: "instagram",
+    category: "casual",
+    verdict: "adapt",
+    title: "Denim shirt + leggings + graphic tee",
+    description: "Oversized light-wash denim shirt over a graphic tee, with black leggings, chunky sneakers, white crew socks.",
+    whyItWorks: "The denim shirt as a layer is a good instinct and the colour palette is simple.",
+    whatToChange: "This is essentially elevated activewear — fine for errands but won't move you toward 'put-together'. The leggings + chunky sneakers combo is what you're trying to move away from. Use the denim shirt but pair it with proper bottoms (shorts, skirt, or jeans).",
+    keyElements: ["Denim shirt as layer", "Casual", "Activewear-adjacent"],
+    formulaMatch: "The Denim Shirt (needs upgrade)",
+    note: "Take the denim shirt concept, lose the leggings.",
+  },
+  {
+    id: 10,
+    source: "instagram",
+    category: "casual",
+    verdict: "adapt",
+    title: "Denim shirt + grey wide-leg pants + slippers",
+    description: "Mid-wash denim button-up shirt (untucked), light grey wide-leg jersey pants, tan slipper-style shoes. Work-from-home styling.",
+    whyItWorks: "The denim-over-soft-pants concept bridges the gap between comfort and polish. The colour combination is easy.",
+    whatToChange: "The completely untucked shirt over wide-leg soft pants erases your waist entirely. Either half-tuck the shirt, or swap the wide pants for a tapered jogger or proper trouser. On your frame, this needs at least one point of definition.",
+    keyElements: ["Denim shirt", "Comfort-first", "Neutral palette"],
+    formulaMatch: "The Elevated Daily (comfort variant)",
+    note: "WFH dressing is valid — just add a tuck.",
+  },
+  {
+    id: 11,
+    source: "instagram",
+    category: "casual",
+    verdict: "adapt",
+    title: "Grey matching sweatsuit with half-zip",
+    description: "Light grey marle matching set — half-zip cropped sweatshirt with wide-leg sweatpants. Clean, tonal, comfortable.",
+    whyItWorks: "The matching set looks more intentional than mismatched sweats. The half-zip adds a design element. The cropped length is right.",
+    whatToChange: "The wide-leg bottom is the issue again for your shape. Look for matching sets where the pant is tapered or straight-leg. The cropped top half already works for your torso.",
+    keyElements: ["Matching set", "Tonal dressing", "Cropped top", "Comfort-first"],
+    formulaMatch: "None (loungewear territory)",
+    note: "If you want a matching set, look for tapered or jogger-style bottoms rather than wide-leg.",
+  },
+  {
+    id: 12,
+    source: "instagram",
+    category: "layering",
+    verdict: "adapt",
+    title: "White bomber + denim shirt + white sweats + boots",
+    description: "White zip bomber jacket over a mid-wash denim shirt, white sweatpants, tan boots. Triple layer, oversized.",
+    whyItWorks: "The colour blocking is interesting — all light tones with denim as the contrast.",
+    whatToChange: "Triple oversized layers would completely obscure your shape. This is a look that works on very straight/narrow frames. On your hourglass, you'd lose everything. Take the colour concept (cream + denim blue) but apply it to your silhouette rules.",
+    keyElements: ["Triple layering", "Cream + denim palette", "Oversized"],
+    formulaMatch: "Not recommended as-is",
+    note: "Good palette inspiration, wrong silhouette for your body.",
+  },
+  {
+    id: 13,
+    source: "instagram",
+    category: "dressy",
+    verdict: "yes",
+    title: "All-black: turtleneck + satin midi skirt with lace hem",
+    description: "Black turtleneck knit with a black satin midi skirt featuring lace trim at the hem. Structured black bag, nude pointed-toe flats.",
+    whyItWorks: "This is elegant without being overdressed. The texture contrast — matte knit, satin skirt, lace detail — creates visual interest within monochrome. The midi length would suit your height, and the satin would follow your curves naturally. The turtleneck frames your face well with your jawline and hair length.",
+    keyElements: ["All-black", "Texture contrast", "Satin + knit", "Lace detail", "Midi length"],
+    formulaMatch: "The Monochrome Stack",
+    note: "One of the strongest looks in your saves — highly translatable to your body with minimal adaptation. Just make sure the turtleneck is fitted, not oversized.",
+  },
+  {
+    id: 14,
+    source: "instagram",
+    category: "dressy",
+    verdict: "yes",
+    title: "Black turtleneck + grey wide jeans + belt + boots",
+    description: "Black turtleneck tucked into high-waisted grey/charcoal jeans with a western-style belt. Black boots, structured bag.",
+    whyItWorks: "The tuck, the belt, and the monochrome-with-a-twist palette all work. The belt is doing crucial work here — defining the waist in what could otherwise be a formless outfit.",
+    whatToChange: "On your frame, make the jeans straight rather than wide, and make sure they sit cleanly at the ankle above the boots. The rest translates directly.",
+    keyElements: ["Turtleneck tuck", "Belt definition", "Dark tonal palette", "Boots"],
+    formulaMatch: "The Monochrome Stack",
+    note: "A belt is the secret weapon you're missing — this look proves it.",
+  },
+  {
+    id: 15,
+    source: "instagram",
+    category: "casual",
+    verdict: "yes",
+    title: "Striped henley knit + light jeans + Birkenstocks",
+    description: "Cream and tan striped polo/henley collar knit, slightly relaxed fit, with light wash high-waisted jeans and brown Birkenstock-style sandals.",
+    whyItWorks: "Effortless and easy. The colour palette (cream, tan, light denim, brown) is warm and cohesive. The henley collar adds enough detail that you don't need accessories. The jeans appear to be a straight or relaxed-straight cut ending above the ankle — perfect with flat sandals.",
+    keyElements: ["Striped knit", "Warm neutrals", "Henley collar", "Ankle-length jeans", "Flat sandals"],
+    formulaMatch: "The Striped Knit",
+    note: "Very doable for you. One of the most directly translatable looks in your saves.",
+  },
+  {
+    id: 16,
+    source: "instagram",
+    category: "layering",
+    verdict: "yes",
+    title: "Denim shirt + brown shorts + tights + ankle boots",
+    description: "Dark denim shirt tucked into chocolate brown shorts with black tights and black ankle boots. Belt, crossbody bag.",
+    whyItWorks: "The colour combination is rich — dark denim + chocolate + black. The tuck and belt define the waist. The tights extend the leg line through to the boots, making the shorts work in cooler weather. This is your denim shirt formula winterised.",
+    keyElements: ["Denim + chocolate", "Belt tuck", "Tights for leg extension", "Ankle boots"],
+    formulaMatch: "The Denim Shirt (winter version)",
+    note: "Excellent autumn/winter adaptation. The tights-to-boots trick is worth remembering.",
+  },
+  {
+    id: 17,
+    source: "instagram",
+    category: "summer",
+    verdict: "yes",
+    title: "Cream V-neck knit + denim skirt + brown knee boots",
+    description: "Oversized cream V-neck knit over a denim mini skirt, with tall brown suede boots. Structured bag, sunglasses.",
+    whyItWorks: "The proportions work because the boots create a long unbroken leg line that balances the volume of the knit. The V-neck keeps it open at the neckline. The cream + denim + brown palette is right in your wheelhouse.",
+    whatToChange: "Make sure the knit isn't so oversized it looks like a dress on you — your hourglass means truly oversized knits can engulf your shape. A slightly relaxed fit (not skin-tight, not tent) is the sweet spot.",
+    keyElements: ["Volume management", "Tall boots for leg line", "Cream + denim + brown", "V-neckline"],
+    formulaMatch: "The Elevated Daily (transitional weather)",
+    note: "If you invest in tall boots, this opens up a whole transitional-weather formula.",
+  },
+  {
+    id: 18,
+    source: "instagram",
+    category: "casual",
+    verdict: "yes",
+    title: "Denim shirt + brown shorts + striped cardigan + loafers",
+    description: "Denim shirt layered under a cream/navy striped cardigan, with chocolate shorts, white socks, black loafers. Crossbody bag.",
+    whyItWorks: "Triple layering done right for your shape — each layer is a different length and texture, but nothing is oversized. The shorts keep the bottom half clean. The striped cardigan adds pattern without overwhelming. The loafers with socks is exactly your current footwear comfort zone.",
+    keyElements: ["Smart layering", "Pattern mixing", "Denim + chocolate", "Loafers with socks"],
+    formulaMatch: "The Denim Shirt + The Striped Knit hybrid",
+    note: "This is how layering should work on your body — structured, not voluminous.",
+  },
+  {
+    id: 19,
+    source: "instagram",
+    category: "dressy",
+    verdict: "yes",
+    title: "Denim shirt tucked into brown shorts + belt (dressed up)",
+    description: "Dark denim shirt with sleeves rolled, tucked into high-waisted chocolate shorts with a structured belt. Pointed-toe flats, structured bag, sunglasses, delicate necklace.",
+    whyItWorks: "Same base formula as the casual version but elevated with better accessories and a cleaner shoe. The roll on the sleeves, the visible belt, and the structured bag all push this from casual to smart casual. The shorts at this length would show off your legs without being too short.",
+    keyElements: ["French tuck", "Statement belt", "Structured accessories", "Sleeves rolled"],
+    formulaMatch: "The Denim Shirt (elevated)",
+    note: "Proof that the same pieces can scale up or down based on accessories and finishing details.",
+  },
+  {
+    id: 20,
+    source: "instagram",
+    category: "casual",
+    verdict: "yes",
+    title: "Denim shirt + brown shorts + cap + sneakers",
+    description: "Oversized dark denim shirt over chocolate shorts, with a black cap, brown tote bag, white sneakers with socks.",
+    whyItWorks: "The most casual version of the denim + brown formula. The cap adds attitude without effort. The tote bag is practical. This is a strong weekend errand look.",
+    whatToChange: "On your frame, don't let the shirt hang fully untucked — at minimum do a front tuck to show the waistband of the shorts.",
+    keyElements: ["Casual denim shirt", "Brown shorts", "Cap for attitude", "Sneakers"],
+    formulaMatch: "The Denim Shirt (weekend casual)",
+    note: "A cap is an underrated accessory for making 'I'm just running errands' look intentional.",
+  },
+];
+
+const Badge = ({ label, color, bg }) => (
+  <span style={{
+    fontSize: "10px", fontWeight: 600, padding: "3px 10px",
+    borderRadius: "10px", background: bg, color: color,
+    fontFamily: "'DM Sans', sans-serif", whiteSpace: "nowrap",
+  }}>{label}</span>
+);
+
+const EntryCard = ({ entry }) => {
+  const cat = categories[entry.category];
+  const verd = verdicts[entry.verdict];
+  return (
+    <div style={{
+      background: c.card, borderRadius: "12px", padding: "20px 24px",
+      border: `1px solid ${c.border}`, display: "flex", flexDirection: "column", gap: "12px",
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px", flexWrap: "wrap" }}>
+        <h3 style={{ margin: 0, fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: c.text, flex: 1, minWidth: 200 }}>
+          {entry.title}
+        </h3>
+        <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+          <Badge label={cat.label} color={cat.color} bg={cat.bg} />
+          <Badge label={verd.label} color={verd.color} bg={verd.bg} />
+        </div>
+      </div>
+
+      <p style={{ margin: 0, fontSize: "13px", color: c.textMuted, lineHeight: 1.6, fontStyle: "italic" }}>
+        {entry.description}
+      </p>
+
+      <div>
+        <p style={{ margin: "0 0 4px", fontSize: "11px", fontWeight: 600, color: c.green, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          Why it works
+        </p>
+        <p style={{ margin: 0, fontSize: "13px", color: c.text, lineHeight: 1.6 }}>
+          {entry.whyItWorks}
+        </p>
+      </div>
+
+      {entry.whatToChange && (
+        <div>
+          <p style={{ margin: "0 0 4px", fontSize: "11px", fontWeight: 600, color: c.coral, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            What to adapt
+          </p>
+          <p style={{ margin: 0, fontSize: "13px", color: c.text, lineHeight: 1.6 }}>
+            {entry.whatToChange}
+          </p>
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+        {entry.keyElements.map((el, i) => (
+          <span key={i} style={{
+            fontSize: "11px", padding: "3px 10px", borderRadius: "8px",
+            background: c.bgAlt, color: c.textMuted, fontFamily: "'DM Sans', sans-serif",
+          }}>{el}</span>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${c.border}`, paddingTop: "10px", marginTop: "2px" }}>
+        <span style={{ fontSize: "11px", color: c.accent, fontWeight: 500 }}>
+          Formula: {entry.formulaMatch}
+        </span>
+        <span style={{ fontSize: "11px", color: c.textMuted }}>
+          {entry.source === "own" ? "📸 My outfit" : "📱 Instagram save"}
+        </span>
+      </div>
+
+      {entry.note && (
+        <p style={{ margin: 0, fontSize: "12px", color: c.warm, fontStyle: "italic", lineHeight: 1.5 }}>
+          💡 {entry.note}
+        </p>
+      )}
+    </div>
+  );
+};
+
+function MoodBoard() {
+  const [filter, setFilter] = useState("all");
+  const [verdictFilter, setVerdictFilter] = useState("all");
+
+  const filtered = entries.filter(e => {
+    if (filter !== "all" && e.category !== filter) return false;
+    if (verdictFilter !== "all" && e.verdict !== verdictFilter) return false;
+    return true;
+  });
+
+  const patternCounts = {};
+  const allElements = [];
+  entries.forEach(e => {
+    e.keyElements.forEach(el => {
+      patternCounts[el] = (patternCounts[el] || 0) + 1;
+      allElements.push(el);
+    });
+  });
+  const topPatterns = Object.entries(patternCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  const yesCount = entries.filter(e => e.verdict === "yes").length;
+  const adaptCount = entries.filter(e => e.verdict === "adapt").length;
+  const noCount = entries.filter(e => e.verdict === "no").length;
+  const ownCount = entries.filter(e => e.source === "own").length;
+
+  return (
+    <div style={{ minHeight: "100vh", background: c.bg, fontFamily: "'DM Sans', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+      {/* Header */}
+      <div style={{ background: c.charcoal, padding: "36px 24px 28px", textAlign: "center" }}>
+        <p style={{ margin: "0 0 4px", fontSize: "11px", letterSpacing: "3px", color: c.warm, textTransform: "uppercase" }}>Style Mood Board</p>
+        <h1 style={{ margin: 0, fontSize: "28px", color: c.cream, fontFamily: "'Instrument Serif', serif", fontWeight: 400 }}>
+          Amanda's Inspiration Tracker
+        </h1>
+        <p style={{ margin: "10px auto 0", fontSize: "13px", color: "#9C8E80", maxWidth: 480, lineHeight: 1.5 }}>
+          A living collection of outfit inspiration — catalogued, annotated, and mapped to your body, palette, and style direction.
+        </p>
+      </div>
+
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "24px 24px 64px" }}>
+
+        {/* Pattern Analysis */}
+        <div style={{ background: c.card, borderRadius: "12px", padding: "24px", border: `1px solid ${c.border}`, marginBottom: "24px" }}>
+          <h2 style={{ margin: "0 0 16px", fontSize: "18px", fontFamily: "'Instrument Serif', serif", color: c.text }}>
+            Pattern Analysis
+          </h2>
+          <p style={{ margin: "0 0 16px", fontSize: "13px", color: c.textMuted, lineHeight: 1.6 }}>
+            Based on {entries.length} saved looks ({ownCount} own outfits, {entries.length - ownCount} external inspiration). Here's what keeps showing up:
+          </p>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px" }}>
+            {topPatterns.map(([el, count]) => (
+              <div key={el} style={{
+                display: "flex", alignItems: "center", gap: "6px",
+                background: c.bgAlt, borderRadius: "8px", padding: "6px 12px",
+              }}>
+                <span style={{ fontSize: "12px", color: c.text, fontWeight: 500 }}>{el}</span>
+                <span style={{
+                  fontSize: "10px", fontWeight: 700, color: c.accent,
+                  background: c.accentLight, borderRadius: "50%", width: 20, height: 20,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>{count}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div style={{ background: c.greenLight, borderRadius: "8px", padding: "12px 16px" }}>
+              <span style={{ fontSize: "24px", fontWeight: 700, color: c.green }}>{yesCount}</span>
+              <p style={{ margin: "2px 0 0", fontSize: "11px", color: c.green, fontWeight: 500 }}>Works as-is on your body</p>
+            </div>
+            <div style={{ background: c.warmLight, borderRadius: "8px", padding: "12px 16px" }}>
+              <span style={{ fontSize: "24px", fontWeight: 700, color: c.warm }}>{adaptCount}</span>
+              <p style={{ margin: "2px 0 0", fontSize: "11px", color: c.warm, fontWeight: 500 }}>Needs adapting for your shape</p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "16px", padding: "16px", background: c.bgAlt, borderRadius: "8px" }}>
+            <p style={{ margin: 0, fontSize: "13px", color: c.text, lineHeight: 1.7 }}>
+              <strong>Emerging themes:</strong> You're consistently drawn to denim-as-a-layer (shirts, jackets), earth tones mixed with denim blue, and waist-defining details (belts, tucks). The most common adaptation needed is swapping wide/baggy bottoms for straight or tapered ones. Your eye for colour and layering is strong — proportions are the main thing to watch.
+            </p>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "20px" }}>
+          <span style={{ fontSize: "12px", color: c.textMuted, alignSelf: "center", marginRight: "4px" }}>Category:</span>
+          {[{ key: "all", label: "All" }, ...Object.entries(categories).map(([k, v]) => ({ key: k, label: v.label }))].map(f => (
+            <button key={f.key} onClick={() => setFilter(f.key)} style={{
+              padding: "6px 14px", borderRadius: "16px", border: "none", cursor: "pointer",
+              fontSize: "11px", fontFamily: "'DM Sans', sans-serif", fontWeight: filter === f.key ? 600 : 400,
+              background: filter === f.key ? c.accent : c.bgAlt,
+              color: filter === f.key ? c.card : c.textMuted,
+              transition: "all 0.15s ease",
+            }}>{f.label}</button>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "24px" }}>
+          <span style={{ fontSize: "12px", color: c.textMuted, alignSelf: "center", marginRight: "4px" }}>Verdict:</span>
+          {[{ key: "all", label: "All" }, ...Object.entries(verdicts).map(([k, v]) => ({ key: k, label: v.label }))].map(f => (
+            <button key={f.key} onClick={() => setVerdictFilter(f.key)} style={{
+              padding: "6px 14px", borderRadius: "16px", border: "none", cursor: "pointer",
+              fontSize: "11px", fontFamily: "'DM Sans', sans-serif", fontWeight: verdictFilter === f.key ? 600 : 400,
+              background: verdictFilter === f.key ? c.warm : c.bgAlt,
+              color: verdictFilter === f.key ? c.card : c.textMuted,
+              transition: "all 0.15s ease",
+            }}>{f.label}</button>
+          ))}
+        </div>
+
+        {/* Entries */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {filtered.map(entry => (
+            <EntryCard key={entry.id} entry={entry} />
+          ))}
+          {filtered.length === 0 && (
+            <p style={{ textAlign: "center", color: c.textMuted, fontSize: "14px", padding: "40px 0" }}>
+              No looks match this filter combination.
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ marginTop: "32px", padding: "20px", background: c.warmLight, borderRadius: "12px", textAlign: "center" }}>
+          <p style={{ margin: 0, fontSize: "13px", color: c.text, lineHeight: 1.7 }}>
+            Keep uploading photos and screenshots — each batch refines the pattern map. The more I see of what catches your eye, the more precise the recommendations get.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(MoodBoard));
+  </script>
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amanda's Style Guide</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, useMemo } = React;
+    
+
+const colours = {
+  bg: "#FAF8F5",
+  bgAlt: "#F0EDE8",
+  text: "#2C2825",
+  textMuted: "#6B6560",
+  accent: "#4A6B7A",
+  accentLight: "#D4E1E8",
+  warm: "#A68B6B",
+  warmLight: "#E8DFD3",
+  border: "#DDD8D2",
+  white: "#FFFFFF",
+  cobalt: "#2B5EA7",
+  teal: "#3A8A8C",
+  olive: "#6B7C5E",
+  terracotta: "#B86F50",
+  charcoal: "#3C3937",
+  cream: "#F5F0E8",
+  taupe: "#9C8E80",
+  slate: "#6B7B8A",
+  black: "#1A1816",
+  magenta: "#A84070",
+};
+
+const Tab = ({ label, active, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      padding: "10px 20px",
+      background: active ? colours.accent : "transparent",
+      color: active ? colours.white : colours.textMuted,
+      border: "none",
+      borderRadius: "24px",
+      cursor: "pointer",
+      fontSize: "13px",
+      fontFamily: "'DM Sans', sans-serif",
+      fontWeight: active ? 600 : 400,
+      letterSpacing: "0.3px",
+      transition: "all 0.2s ease",
+      whiteSpace: "nowrap",
+    }}
+  >
+    {label}
+  </button>
+);
+
+const ColourSwatch = ({ colour, name, note, size = 64 }) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: colour,
+        border: colour === "#FAF8F5" || colour === "#F5F0E8" || colour === "#FFFFFF" ? `1px solid ${colours.border}` : "none",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+      }}
+    />
+    <span style={{ fontSize: "12px", fontWeight: 600, color: colours.text, fontFamily: "'DM Sans', sans-serif" }}>{name}</span>
+    {note && <span style={{ fontSize: "10px", color: colours.textMuted, fontFamily: "'DM Sans', sans-serif", textAlign: "center", maxWidth: 80 }}>{note}</span>}
+  </div>
+);
+
+const OutfitCard = ({ title, pieces, context, tip, icon }) => (
+  <div
+    style={{
+      background: colours.white,
+      borderRadius: "12px",
+      padding: "24px",
+      border: `1px solid ${colours.border}`,
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+    }}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <h4 style={{ margin: 0, fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>{title}</h4>
+      <span style={{ fontSize: "20px" }}>{icon}</span>
+    </div>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+      {context.map((c, i) => (
+        <span
+          key={i}
+          style={{
+            fontSize: "10px",
+            padding: "3px 10px",
+            borderRadius: "12px",
+            background: colours.accentLight,
+            color: colours.accent,
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 500,
+          }}
+        >
+          {c}
+        </span>
+      ))}
+    </div>
+    <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      {pieces.map((p, i) => (
+        <li key={i} style={{ fontSize: "13px", color: colours.text, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
+          {p}
+        </li>
+      ))}
+    </ul>
+    {tip && (
+      <div
+        style={{
+          fontSize: "12px",
+          color: colours.textMuted,
+          fontFamily: "'DM Sans', sans-serif",
+          fontStyle: "italic",
+          borderTop: `1px solid ${colours.border}`,
+          paddingTop: "10px",
+          marginTop: "4px",
+          lineHeight: 1.5,
+        }}
+      >
+        {tip}
+      </div>
+    )}
+  </div>
+);
+
+const RuleCard = ({ rule, why }) => (
+  <div style={{ background: colours.warmLight, borderRadius: "10px", padding: "16px 20px" }}>
+    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: colours.text, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>{rule}</p>
+    <p style={{ margin: "6px 0 0", fontSize: "12px", color: colours.textMuted, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>{why}</p>
+  </div>
+);
+
+const SilhouetteRule = ({ label, doText, dontText }) => (
+  <div style={{ background: colours.white, borderRadius: "10px", padding: "16px 20px", border: `1px solid ${colours.border}` }}>
+    <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: colours.text, fontFamily: "'DM Sans', sans-serif" }}>{label}</p>
+    <div style={{ display: "flex", gap: "16px", marginTop: "10px" }}>
+      <div style={{ flex: 1 }}>
+        <span style={{ fontSize: "11px", fontWeight: 600, color: colours.olive, fontFamily: "'DM Sans', sans-serif" }}>DO</span>
+        <p style={{ margin: "4px 0 0", fontSize: "12px", color: colours.text, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>{doText}</p>
+      </div>
+      <div style={{ flex: 1 }}>
+        <span style={{ fontSize: "11px", fontWeight: 600, color: colours.terracotta, fontFamily: "'DM Sans', sans-serif" }}>AVOID</span>
+        <p style={{ margin: "4px 0 0", fontSize: "12px", color: colours.text, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>{dontText}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const sections = [
+  "Overview",
+  "Colours",
+  "Silhouettes",
+  "Outfit Formulas",
+  "Key Pieces",
+  "Accessories",
+  "Shopping Guide",
+];
+
+function StyleGuide() {
+  const [activeSection, setActiveSection] = useState(0);
+
+  return (
+    <div style={{ minHeight: "100vh", background: colours.bg, fontFamily: "'DM Sans', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+      {/* Header */}
+      <div style={{ background: colours.charcoal, padding: "40px 24px 32px", textAlign: "center" }}>
+        <p style={{ margin: "0 0 4px", fontSize: "11px", letterSpacing: "3px", color: colours.taupe, textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+          Personal Style Guide
+        </p>
+        <h1 style={{ margin: 0, fontSize: "32px", color: colours.cream, fontFamily: "'Instrument Serif', serif", fontWeight: 400 }}>
+          Amanda's Wardrobe System
+        </h1>
+        <p style={{ margin: "12px auto 0", fontSize: "13px", color: colours.taupe, maxWidth: 460, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
+          Structured ease · Warm neutrals with cool accents · Confident without trying
+        </p>
+      </div>
+
+      {/* Navigation */}
+      <div
+        style={{
+          display: "flex",
+          gap: "4px",
+          padding: "12px 24px",
+          overflowX: "auto",
+          background: colours.white,
+          borderBottom: `1px solid ${colours.border}`,
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
+      >
+        {sections.map((s, i) => (
+          <Tab key={s} label={s} active={activeSection === i} onClick={() => setActiveSection(i)} />
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 24px 64px" }}>
+        {/* ==================== OVERVIEW ==================== */}
+        {activeSection === 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 16px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Your Style Direction
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.text, lineHeight: 1.8 }}>
+                Your style is what I'd call <strong>"structured ease"</strong> — clothes that have intention and shape but don't feel stiff or overdone. Think clean lines, quality fabrics, and a palette that feels grounded and natural. You already gravitate toward this instinctively (the chore jackets over fitted dresses, the denim skirt with a structured crop tee). The goal now is to build a system around it.
+              </p>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Your Style Profile</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                {[
+                  { label: "Body", value: "Hourglass with muscle, average height, longer torso" },
+                  { label: "Colouring", value: "Fair, neutral-cool undertone, blue-green eyes, dark blonde" },
+                  { label: "Vibe", value: "Structured ease — intentional but never stiff" },
+                  { label: "Priority", value: "Confident and put-together first, comfortable second" },
+                  { label: "Default", value: "Activewear → levelling up to smart casual" },
+                  { label: "Footwear", value: "Flat boots, sneakers, loafers, sandals — no heels" },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <span style={{ fontSize: "11px", fontWeight: 600, color: colours.accent, textTransform: "uppercase", letterSpacing: "0.5px" }}>{item.label}</span>
+                    <p style={{ margin: "4px 0 0", fontSize: "13px", color: colours.text, lineHeight: 1.5 }}>{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: colours.accentLight, borderRadius: "12px", padding: "24px" }}>
+              <h3 style={{ margin: "0 0 12px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.accent }}>The Core Principle</h3>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.text, lineHeight: 1.8 }}>
+                Every outfit follows one rule: <strong>one fitted element + one relaxed element</strong>. This is what makes your dresses-with-chore-jackets work — the dress hugs your shape, the jacket adds ease. Apply this everywhere: fitted top with relaxed trousers, or structured trousers with a soft knit. It keeps you looking intentional without looking rigid.
+              </p>
+            </div>
+
+            <div>
+              <h3 style={{ margin: "0 0 12px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>What This Guide Covers</h3>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.text, lineHeight: 1.8 }}>
+                Use the tabs above to navigate through your personalised colour palette, the silhouettes that work best on your body, ready-made outfit formulas you can mix and match, a key pieces checklist, accessories guidance, and a shopping guide with specific brands and stores that suit your style and budget approach.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== COLOURS ==================== */}
+        {activeSection === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Your Colour Palette
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.textMuted, lineHeight: 1.7 }}>
+                Based on your neutral-cool undertone, blue-green eyes, and fair skin. Your natural colouring has a quiet clarity to it — the right colours will amplify that rather than compete with it.
+              </p>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Foundation Neutrals</h3>
+              <p style={{ margin: "0 0 20px", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>These are your everyday base colours — 70% of your wardrobe lives here.</p>
+              <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" }}>
+                <ColourSwatch colour="#1A1816" name="Soft Black" note="Year-round anchor" />
+                <ColourSwatch colour="#3C3937" name="Charcoal" note="Softer than black" />
+                <ColourSwatch colour="#9C8E80" name="Warm Taupe" note="Your best neutral" />
+                <ColourSwatch colour="#F5F0E8" name="Cream" note="Instead of white" />
+                <ColourSwatch colour="#6B6560" name="Mushroom" note="Layering pieces" />
+                <ColourSwatch colour="#4A3F38" name="Dark Chocolate" note="Like your chore jacket" />
+              </div>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Accent Colours</h3>
+              <p style={{ margin: "0 0 20px", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>These bring your outfits to life — 20% of your wardrobe. Your blue dress proved how well saturated cool tones work on you.</p>
+              <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" }}>
+                <ColourSwatch colour="#2B5EA7" name="Cobalt" note="Your power colour" />
+                <ColourSwatch colour="#3A8A8C" name="Teal" note="Gorgeous with your eyes" />
+                <ColourSwatch colour="#6B7C5E" name="Olive" note="Earth tone with depth" />
+                <ColourSwatch colour="#A84070" name="Magenta" note="You already own this" />
+              </div>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Denim Tones</h3>
+              <p style={{ margin: "0 0 20px", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>Denim is essentially its own neutral in your wardrobe — 10% of the mix.</p>
+              <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" }}>
+                <ColourSwatch colour="#5B7EA1" name="Mid Wash" note="Most versatile" />
+                <ColourSwatch colour="#3D5A80" name="Dark Wash" note="Dressier" />
+                <ColourSwatch colour="#8FAABE" name="Light Wash" note="Summer casual" />
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <h3 style={{ margin: 0, fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Colour Rules</h3>
+              <RuleCard
+                rule="Cream over bright white against your skin"
+                why="Pure white can wash you out slightly. Cream, off-white, and ivory will look more intentional and flattering — like that white tee in Bali works because it's a soft, relaxed white rather than crisp optical white."
+              />
+              <RuleCard
+                rule="Your accent colours work best as the main piece, not as accessories"
+                why="A cobalt dress or teal knit makes a statement. A cobalt scarf over neutrals gets lost. Let your accents be the hero when you use them."
+              />
+              <RuleCard
+                rule="Black + one warm neutral = your easiest formula"
+                why="Black jeans + taupe knit, black dress + chocolate jacket. This combination always works and always looks intentional on you."
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ==================== SILHOUETTES ==================== */}
+        {activeSection === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Silhouettes That Work
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.textMuted, lineHeight: 1.7 }}>
+                Your hourglass shape with muscle means you have natural structure — clothes should acknowledge it, not fight it. The key consideration is your slightly longer torso relative to your legs: everything below is designed to balance that.
+              </p>
+            </div>
+
+            <SilhouetteRule
+              label="Waist Placement"
+              doText="High-waisted everything. This is non-negotiable for your proportions — it visually lengthens your legs and breaks your torso at the right point. Your denim skirt already does this well."
+              dontText="Mid-rise or low-rise bottoms. They'll make your torso look even longer and shorten your legs. Also avoid drop-waist dresses."
+            />
+            <SilhouetteRule
+              label="Top Length"
+              doText="Tops that end at or just above your natural waist — like your cropped tees. Tucked-in tops also work well. The goal is always to show where your waist is."
+              dontText="Long, untucked tops that fall past your hips. They erase your waist and create a boxy silhouette that works against your shape."
+            />
+            <SilhouetteRule
+              label="Trouser Shape"
+              doText="Tapered or straight-leg trousers that end cleanly at the ankle. A slight crop (showing ankle) is great on you — it keeps the leg line clean, especially with flat shoes."
+              dontText="Wide-leg pants that pool at the floor (like your current baggy jeans). The volume at the bottom combined with flat shoes shortens your legs visually."
+            />
+            <SilhouetteRule
+              label="Dress Shape"
+              doText="Fitted through the waist with some structure — like your blue dress. Bodycon is fine when the fabric has some weight to it (not clingy jersey). Wrap dresses and fit-and-flare both work."
+              dontText="Shift dresses or anything that hangs straight from the shoulders. They bypass your waist entirely and can look tent-like."
+            />
+            <SilhouetteRule
+              label="Layering"
+              doText="Structured layers that end at the hip or above — chore jackets, cropped cardigans, blazers. Your brown jacket is a perfect example. The layer should frame your torso, not obscure it."
+              dontText="Long, drapey cardigans or oversized coats that engulf your shape. If you want a longer jacket, make sure it's belted or has waist definition."
+            />
+            <SilhouetteRule
+              label="Showing Your Build"
+              doText="When you want your athletic build visible: fitted knits, cap sleeves, or sleeveless tops show your arms and shoulders nicely. When you want it softer: a structured jacket or slightly relaxed sleeve creates shape without clinging."
+              dontText="Skin-tight everything or super-oversized everything. The contrast between one fitted and one relaxed piece is what makes it look considered."
+            />
+
+            <div style={{ background: colours.accentLight, borderRadius: "12px", padding: "20px" }}>
+              <p style={{ margin: 0, fontSize: "13px", color: colours.accent, lineHeight: 1.7, fontStyle: "italic" }}>
+                <strong>The ankle rule:</strong> With flat shoes (your preference), showing a bit of ankle makes a disproportionate difference. It's the simplest way to make jeans + sneakers look intentional rather than sloppy. Cuff, crop, or choose ankle-length trousers.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== OUTFIT FORMULAS ==================== */}
+        {activeSection === 3 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Outfit Formulas
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.textMuted, lineHeight: 1.7 }}>
+                These are plug-and-play combinations. Each one works across your colour palette — just swap colours in and out. The formulas are ordered from most casual to most dressed up.
+              </p>
+            </div>
+
+            <h3 style={{ margin: "0", fontSize: "14px", color: colours.accent, textTransform: "uppercase", letterSpacing: "1px" }}>Everyday Smart Casual</h3>
+
+            <OutfitCard
+              title="The Elevated Daily"
+              icon="☀️"
+              context={["Daily errands", "Coffee catch-ups", "Casual work"]}
+              pieces={[
+                "High-waisted straight or tapered jeans (dark or mid wash)",
+                "Fitted crew-neck tee or ribbed tank in cream/taupe/black",
+                "Chore jacket or denim jacket layered over",
+                "Sneaker-loafers or clean white sneakers",
+              ]}
+              tip="This is your current denim skirt formula, upgraded. The jeans make it more versatile across settings. Roll the cuffs once for a clean ankle line."
+            />
+
+            <OutfitCard
+              title="The Smart Knit"
+              icon="🍂"
+              context={["Cooler days", "Lunch dates", "Meetings"]}
+              pieces={[
+                "High-waisted tapered trousers in charcoal, black, or olive",
+                "Cropped ribbed knit or fitted V-neck in taupe/cream/teal",
+                "Loafers or ankle boots",
+                "Delicate gold or silver chain necklace",
+              ]}
+              tip="The camel cardigan you have works perfectly here — just make sure the trousers are tapered, not wide. This is a strong interview outfit too with the right trouser."
+            />
+
+            <OutfitCard
+              title="The Dress Formula"
+              icon="✨"
+              context={["Versatile", "Dates", "Semi-formal"]}
+              pieces={[
+                "Fitted short-sleeve or sleeveless dress (like your magenta/black/aqua dresses)",
+                "Chore jacket or structured denim jacket",
+                "Sneaker-loafers (casual) or ankle boots (dressier)",
+                "Beaded or chain necklace at the collarbone",
+              ]}
+              tip="You've already nailed this formula. Scale it: add more dresses in your accent colours (cobalt, teal, olive) and you'll have a rotation that covers almost any smart casual scenario."
+            />
+
+            <OutfitCard
+              title="The Denim Shirt"
+              icon="👖"
+              context={["Weekend smart casual", "Brunch", "Errands that might turn into drinks"]}
+              pieces={[
+                "Relaxed denim button-up shirt (mid or dark wash)",
+                "High-waisted shorts in chocolate/tan, or your denim skirt",
+                "Half-tuck or French tuck the shirt to define waist",
+                "Loafers with socks, or flat sandals in summer",
+              ]}
+              tip="Inspired by the combos you saved — denim shirt + brown shorts is a killer palette on you. The key is the tuck: it separates this from 'I just threw on a shirt' to 'I meant to look like this.' Add a belt to anchor the waist."
+            />
+
+            <OutfitCard
+              title="The High-Low Mix"
+              icon="🎭"
+              context={["Date night", "Dinner with friends", "When you want to look effortless but polished"]}
+              pieces={[
+                "Relaxed knit or sweatshirt (grey marle, cream, or taupe)",
+                "Satin midi skirt in black, chocolate, or olive",
+                "Ankle boots or pointed-toe flats",
+                "Simple gold or silver jewellery",
+              ]}
+              tip="This is the sweatshirt-over-satin-skirt formula you saved. The contrast between casual on top and dressy on bottom is the whole point. On your shape, make sure the knit is cropped or tucked — not hanging loose over the skirt — so your waist stays defined."
+            />
+
+            <OutfitCard
+              title="The Monochrome Stack"
+              icon="🖤"
+              context={["Girls' dinner", "Evening events", "When you want to look sharp with zero effort"]}
+              pieces={[
+                "Black turtleneck or mock-neck knit",
+                "Black satin midi skirt with lace or textural detail, OR dark grey straight jeans with a belt",
+                "Black ankle boots",
+                "One ring or small hoop earrings",
+              ]}
+              tip="The all-black dinner look you saved is a strong formula for you. The trick to making monochrome interesting is texture contrast — matte knit against satin, or smooth leather boots against woven fabric. The belt adds definition even when the tones are the same."
+            />
+
+            <OutfitCard
+              title="The Striped Knit"
+              icon="🧶"
+              context={["Casual weekend", "Coffee dates", "Relaxed smart casual"]}
+              pieces={[
+                "Striped henley or polo-collar knit in cream/tan or cream/navy",
+                "High-waisted straight jeans (light wash for summer, dark for winter)",
+                "Birkenstock-style sandals or loafers",
+                "Simple necklace, sleeves slightly pushed up",
+              ]}
+              tip="That cream striped knit you saved is a perfect 'I didn't try but I look great' piece. The polo collar or henley buttons add enough detail that you don't need accessories to make it feel finished."
+            />
+
+            <h3 style={{ margin: "12px 0 0", fontSize: "14px", color: colours.accent, textTransform: "uppercase", letterSpacing: "1px" }}>Dressing Up</h3>
+
+            <OutfitCard
+              title="The Polished Professional"
+              icon="💼"
+              context={["Job interviews", "Presentations", "Professional networking"]}
+              pieces={[
+                "Well-fitted tapered trousers in black or charcoal",
+                "Fitted knit top or structured blouse in cream, taupe, or cobalt",
+                "Clean blazer in black or dark chocolate (slightly cropped or nipped at waist)",
+                "Loafers or clean ankle boots, simple jewellery",
+              ]}
+              tip="For interviews, cobalt top + charcoal trousers + dark blazer is a strong combination — it's professional but not generic, and the cobalt pulls out your eye colour."
+            />
+
+            <OutfitCard
+              title="The Going Out"
+              icon="🌙"
+              context={["Dinner", "Nights out", "Events"]}
+              pieces={[
+                "Fitted dress in an accent colour (cobalt, teal, magenta) or black",
+                "Strappy sandals or pointed-toe flat boots",
+                "One statement piece of jewellery — earrings or a bolder necklace",
+                "Optional: cropped leather or suede jacket for edge",
+              ]}
+              tip="Your blue dress is a masterclass in this. The key is: fitted dress, one strong colour, minimal accessories. Let the dress and your body do the work."
+            />
+
+            <h3 style={{ margin: "12px 0 0", fontSize: "14px", color: colours.accent, textTransform: "uppercase", letterSpacing: "1px" }}>Summer Specific</h3>
+
+            <OutfitCard
+              title="The Sydney Summer"
+              icon="🌊"
+              context={["Hot days", "Weekend casual", "Beach-to-café"]}
+              pieces={[
+                "High-waisted denim skirt or linen shorts",
+                "Fitted ribbed tank or linen crop top in cream/olive/teal",
+                "Flat leather sandals or slides",
+                "Small crossbody bag, sunglasses",
+              ]}
+              tip="Your denim skirt + white crop tee is already here — add a linen option and sandals that aren't rubber and it goes from beach to brunch instantly."
+            />
+          </div>
+        )}
+
+        {/* ==================== KEY PIECES ==================== */}
+        {activeSection === 4 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Key Pieces Checklist
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.textMuted, lineHeight: 1.7 }}>
+                These are the building blocks. You already own some of these — I've noted which ones. Focus on filling the gaps rather than buying everything at once.
+              </p>
+            </div>
+
+            {[
+              {
+                category: "Bottoms",
+                items: [
+                  { piece: "High-waisted straight jeans — dark wash", owned: false, priority: "high" },
+                  { piece: "High-waisted straight jeans — mid wash", owned: true, priority: "owned" },
+                  { piece: "Tapered trousers — black or charcoal", owned: false, priority: "high" },
+                  { piece: "Tapered trousers — olive or taupe", owned: false, priority: "medium" },
+                  { piece: "High-waisted denim skirt", owned: true, priority: "owned" },
+                  { piece: "High-waisted shorts — chocolate or tan", owned: false, priority: "medium" },
+                  { piece: "Satin midi skirt — black, chocolate, or olive", owned: false, priority: "medium" },
+                  { piece: "Linen or cotton shorts — high-waisted", owned: false, priority: "low" },
+                ],
+              },
+              {
+                category: "Tops",
+                items: [
+                  { piece: "Fitted crew-neck tees — black, cream, taupe (×2 each)", owned: "partial", priority: "high" },
+                  { piece: "Ribbed tank tops — black, cream, olive", owned: false, priority: "medium" },
+                  { piece: "Relaxed denim button-up shirt", owned: false, priority: "high" },
+                  { piece: "Black turtleneck or mock-neck knit", owned: false, priority: "high" },
+                  { piece: "Striped henley or polo-collar knit — cream/tan", owned: false, priority: "medium" },
+                  { piece: "Cropped ribbed knit — taupe (like your cardigan but pullover)", owned: "partial", priority: "medium" },
+                  { piece: "Fitted V-neck knit — teal or cobalt", owned: false, priority: "medium" },
+                  { piece: "Structured blouse — cream or white", owned: false, priority: "medium" },
+                ],
+              },
+              {
+                category: "Dresses",
+                items: [
+                  { piece: "Fitted short-sleeve dress — magenta", owned: true, priority: "owned" },
+                  { piece: "Fitted short-sleeve dress — black", owned: true, priority: "owned" },
+                  { piece: "Fitted short-sleeve dress — pastel aqua", owned: true, priority: "owned" },
+                  { piece: "Fitted dress in cobalt or teal", owned: false, priority: "medium" },
+                  { piece: "Going-out dress (fitted, accent colour)", owned: true, priority: "owned" },
+                ],
+              },
+              {
+                category: "Layers",
+                items: [
+                  { piece: "Brown chore jacket", owned: true, priority: "owned" },
+                  { piece: "Denim jacket — light wash", owned: true, priority: "owned" },
+                  { piece: "Cropped blazer — black or charcoal", owned: false, priority: "high" },
+                  { piece: "Cropped leather or suede jacket", owned: false, priority: "low" },
+                  { piece: "Camel/taupe cropped cardigan", owned: true, priority: "owned" },
+                ],
+              },
+              {
+                category: "Footwear",
+                items: [
+                  { piece: "Sneaker-loafers (your current pair)", owned: true, priority: "owned" },
+                  { piece: "Clean leather loafers — black or tan", owned: false, priority: "high" },
+                  { piece: "Ankle boots — black, flat or low heel", owned: false, priority: "high" },
+                  { piece: "Clean white sneakers (not chunky)", owned: false, priority: "medium" },
+                  { piece: "Flat leather sandals — tan or black", owned: false, priority: "medium" },
+                  { piece: "Birkenstock-style sandals — brown or black", owned: false, priority: "medium" },
+                ],
+              },
+            ].map((group) => (
+              <div key={group.category} style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+                <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>{group.category}</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {group.items.map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "4px",
+                          border: item.priority === "owned" || item.owned === true ? "none" : `2px solid ${colours.border}`,
+                          background: item.priority === "owned" || item.owned === true ? colours.accent : "transparent",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          fontSize: "12px",
+                          color: colours.white,
+                        }}
+                      >
+                        {(item.priority === "owned" || item.owned === true) && "✓"}
+                      </div>
+                      <span style={{ fontSize: "13px", color: colours.text, flex: 1, lineHeight: 1.4 }}>{item.piece}</span>
+                      {item.priority !== "owned" && (
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            padding: "2px 8px",
+                            borderRadius: "8px",
+                            background: item.priority === "high" ? colours.terracotta + "20" : item.priority === "medium" ? colours.warm + "20" : colours.bgAlt,
+                            color: item.priority === "high" ? colours.terracotta : item.priority === "medium" ? colours.warm : colours.textMuted,
+                            fontWeight: 600,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {item.priority}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div style={{ background: colours.warmLight, borderRadius: "12px", padding: "20px" }}>
+              <p style={{ margin: 0, fontSize: "13px", color: colours.text, lineHeight: 1.7 }}>
+                <strong>Shopping order suggestion:</strong> Start with the high-priority gaps — dark wash jeans, black tapered trousers, a cropped blazer, leather loafers, and ankle boots. These five pieces will unlock the most outfit combinations with what you already own.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== ACCESSORIES ==================== */}
+        {activeSection === 5 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Accessories & Jewellery
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.textMuted, lineHeight: 1.7 }}>
+                You already wear a beaded choker necklace and a nose ring — that's actually a strong starting point. Your accessories approach should be: few pieces, always on, quietly distinctive.
+              </p>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 12px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Metal Tone</h3>
+              <p style={{ margin: 0, fontSize: "13px", color: colours.text, lineHeight: 1.7 }}>
+                With your neutral-cool undertone, you can wear both gold and silver, but <strong>silver and white gold</strong> will look the most harmonious with your colouring. Gold works too — especially brushed or matte gold — but avoid very yellow or rose gold, which can clash with your cool undertone. Mixed metals are also fine and feel modern.
+              </p>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Your Jewellery Essentials</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {[
+                  { piece: "Delicate chain necklace (40–45cm)", note: "Sits at the collarbone. Wear daily — it bridges the gap between 'wearing nothing' and 'wearing jewellery'. Works with every neckline you wear." },
+                  { piece: "Small hoop or stud earrings", note: "A simple pair you never take off. Hoops add a bit of edge that suits your nose ring aesthetic; studs keep it minimal." },
+                  { piece: "One or two thin stacking rings", note: "Simple bands, worn on different fingers. Adds visual interest to your hands without effort." },
+                  { piece: "A quality watch or cuff bracelet", note: "Optional, but a clean-faced watch on a leather or mesh strap adds quiet polish to any outfit. This is the piece that makes jeans and a tee look intentional." },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: colours.text }}>{item.piece}</p>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>{item.note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Belts</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {[
+                  { piece: "Simple leather belt — black, silver or minimal buckle", note: "Essential for the denim shirt + shorts formula, the monochrome stack, and any time you're tucking in a top. A belt defines your waist even when the outfit is relaxed. This showed up in almost every look you saved." },
+                  { piece: "Tan or brown leather belt", note: "Pairs with your earth-tone palette — chocolate shorts, denim skirts, olive trousers. Doesn't need to match your shoes exactly, just needs to be in the same tonal family." },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: colours.text }}>{item.piece}</p>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>{item.note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Bags</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                {[
+                  { piece: "Structured crossbody — black or tan leather", note: "Your daily bag. Something with clean lines and a simple strap (ditch the branded gym-bag straps). This is the single accessory upgrade that'll make the biggest difference to how your outfits read." },
+                  { piece: "Simple tote — canvas or leather", note: "For days when you're carrying more. A quality canvas tote looks elevated if it's clean and unbranded." },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: colours.text }}>{item.piece}</p>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>{item.note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Socks (Yes, These Matter)</h3>
+              <p style={{ margin: 0, fontSize: "13px", color: colours.text, lineHeight: 1.7 }}>
+                You mentioned wearing skin-coloured high socks with your loafers — that's a solid instinct because it keeps the line clean. A few guidelines: with loafers and sandals, either no-show socks or bare legs. With sneakers, you can do the visible sock thing but keep them simple — white or cream crew socks are fine, just avoid athletic logos. With ankle boots, socks don't matter because they're hidden. The chunky white socks + chunky white sneakers combo from your mirror photos is the one thing I'd phase out — it adds visual weight at the bottom.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== SHOPPING GUIDE ==================== */}
+        {activeSection === 6 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 8px", fontSize: "24px", fontFamily: "'Instrument Serif', serif", color: colours.text, fontWeight: 400 }}>
+                Where to Shop
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: colours.textMuted, lineHeight: 1.7 }}>
+                Smart budget means buying fewer, better things. These are brands and stores available in Sydney (online and in-store) that suit your style direction and won't break the bank — with a few investment options for key pieces.
+              </p>
+            </div>
+
+            {[
+              {
+                tier: "Everyday Essentials ($30–80)",
+                note: "For basics, tees, tanks, and pieces you'll rotate heavily",
+                brands: [
+                  { name: "Uniqlo", why: "Best basics for the price. Their ribbed tanks, crew-neck tees, and high-waisted jeans are all relevant to your wardrobe. The U line has more structure and better fabrics." },
+                  { name: "ASOS (curated)", why: "Good for affordable tapered trousers and simple dresses. Filter by colour and stick to simple silhouettes — don't get lost in the volume." },
+                  { name: "Cotton On (The Good line)", why: "Their basics have improved significantly. Good for layering tees and simple knits in your neutral palette." },
+                ],
+              },
+              {
+                tier: "Core Wardrobe ($80–200)",
+                note: "For the pieces that anchor your outfits — jeans, trousers, knits, jackets",
+                brands: [
+                  { name: "Glassons / Dissh", why: "Strong on smart casual dresses and fitted knits in the colour range you need. Good trouser options too." },
+                  { name: "COS", why: "Clean, structured basics with excellent fabric quality. Their tailored trousers and simple knits are perfect for your 'structured ease' direction." },
+                  { name: "& Other Stories", why: "Good middle ground between fast fashion and investment. Strong on blazers, knitwear, and dresses with interesting details." },
+                  { name: "Levi's", why: "For jeans specifically. The Ribcage straight or the 501 Crop in dark wash will serve you well." },
+                ],
+              },
+              {
+                tier: "Investment Pieces ($200+)",
+                note: "For the items you wear 3+ times a week — shoes, blazer, one great bag",
+                brands: [
+                  { name: "Everlane", why: "Their Day Loafer and ankle boots are well-made and will last. Shipping to Australia is straightforward." },
+                  { name: "Sézane", why: "French brand with beautiful knits and accessories. Their jewellery line is excellent for your aesthetic — simple, warm-toned, distinctive without being loud." },
+                  { name: "Arket", why: "Minimal, quality-focused. Good for a structured blazer or a quality leather bag that'll anchor your look." },
+                  { name: "The Iconic (filter by brand)", why: "Use as a discovery tool — filter by your colours and brands above. Good for comparing options and catching sales." },
+                ],
+              },
+            ].map((tier) => (
+              <div key={tier.tier} style={{ background: colours.white, borderRadius: "12px", padding: "24px", border: `1px solid ${colours.border}` }}>
+                <h3 style={{ margin: "0 0 4px", fontSize: "16px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>{tier.tier}</h3>
+                <p style={{ margin: "0 0 16px", fontSize: "12px", color: colours.textMuted }}>{tier.note}</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  {tier.brands.map((b, i) => (
+                    <div key={i}>
+                      <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: colours.text }}>{b.name}</p>
+                      <p style={{ margin: "4px 0 0", fontSize: "12px", color: colours.textMuted, lineHeight: 1.5 }}>{b.why}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div style={{ background: colours.accentLight, borderRadius: "12px", padding: "20px" }}>
+              <h3 style={{ margin: "0 0 8px", fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.accent }}>The Smart Budget Approach</h3>
+              <p style={{ margin: 0, fontSize: "13px", color: colours.text, lineHeight: 1.7 }}>
+                Spend less on things that touch your skin daily (tees, tanks — they wear out and that's fine). Spend more on things that frame your outfit (shoes, jacket, bag — these set the tone and last years). And always check if you already own something that fills the gap before buying — your existing pieces are better than you think, they just need better companions.
+              </p>
+            </div>
+
+            <div style={{ background: colours.warmLight, borderRadius: "12px", padding: "20px" }}>
+              <h3 style={{ margin: "0 0 8px", fontSize: "15px", fontFamily: "'Instrument Serif', serif", color: colours.text }}>Your First Shopping Trip</h3>
+              <p style={{ margin: 0, fontSize: "13px", color: colours.text, lineHeight: 1.7 }}>
+                If you're doing one trip to get started, here's what to prioritise: <strong>(1)</strong> A pair of dark wash straight jeans (Levi's or Uniqlo), <strong>(2)</strong> black tapered trousers (COS or Dissh), <strong>(3)</strong> black ankle boots (invest here — you'll wear them constantly), <strong>(4)</strong> a cropped black blazer (& Other Stories or COS), <strong>(5)</strong> two fitted crew-neck tees in cream and black (Uniqlo). Total estimated: $400–600. That unlocks at least 10 new outfits with what you already own.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(StyleGuide));
+  </script>
+</body>
+</html>
